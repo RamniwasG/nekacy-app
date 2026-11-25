@@ -15,6 +15,7 @@ function EventsContent() {
 	const [dateFilter, setDateFilter] = useState('');
 	const [venueFilter, setVenueFilter] = useState('');
 	const [isFilterOpen, setIsFilterOpen] = useState(false);
+	const [isLoading, setIsLoading] = useState(true);
 	const dispatch = useDispatch();
 	const router = useRouter();
 		const searchParams = useSearchParams();
@@ -25,7 +26,10 @@ function EventsContent() {
 		const auth = authStorage.get();
 		const userId = auth?.user?.id;
 		const request = listMode === 'upcoming' ? eventApi.upcoming(userId) : eventApi.list(userId);
-		request.then((data) => dispatch(setEvents(data))).catch(console.error);
+		request
+			.then((data) => dispatch(setEvents(data)))
+			.catch(console.error)
+			.finally(() => setIsLoading(false));
 	}, [dispatch, listMode]);
 
 	const filteredEvents = [...events]
@@ -200,11 +204,15 @@ function EventsContent() {
 								: 'flex flex-col gap-4'
 						}
 					>
-						{filteredEvents.length === 0 ? (
-							<p className="col-span-full text-center text-sm text-neutral-500">
-								No events found for &quot;{searchQuery}&quot;.
-							</p>
-						) : (
+						{isLoading && (
+							<div className="col-span-full flex justify-center py-12">
+								<div className="h-10 w-10 animate-spin rounded-full border-b-2 border-t-2 border-neutral-900" />
+							</div>
+						)}
+						{!isLoading && filteredEvents.length === 0 && (
+							<p className="col-span-full text-center text-sm text-neutral-500">No events found for &quot;{searchQuery}&quot;.</p>
+						)}
+						{!isLoading && filteredEvents.length > 0 && (
 							[...filteredEvents].reverse().map((event) => (
 								<article
 									key={event.id}

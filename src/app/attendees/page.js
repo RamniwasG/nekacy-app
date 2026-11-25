@@ -23,6 +23,7 @@ export default function AttendeesPage() {
 	const [giftFilter, setGiftFilter] = useState('');
 	const [paymentModeFilter, setPaymentModeFilter] = useState('');
 	const [isFilterOpen, setIsFilterOpen] = useState(false);
+	const [isLoading, setIsLoading] = useState(true);
 	const dispatch = useDispatch();
 	const selectedEvent = useSelector((state) => state.app.selectedEvent);
 	const allAttendees = useSelector((state) => state.app.attendees);
@@ -47,7 +48,10 @@ export default function AttendeesPage() {
 
 	useEffect(() => {
 		if (!eventId) return;
-		attendeeApi.list(eventId).then((data) => dispatch(setAttendees(data))).catch(console.error);
+		attendeeApi.list(eventId)
+			.then((data) => dispatch(setAttendees(data)))
+			.catch(console.error)
+			.finally(() => setIsLoading(false));
 	}, [dispatch, eventId]);
 
 	async function handleDeleteAttendee(attendee) {
@@ -248,6 +252,16 @@ export default function AttendeesPage() {
 								: 'flex flex-col gap-4'
 						}
 					>
+						{filteredAttendees.length === 0 && !isLoading && (
+							<p className="col-span-full text-center py-4 text-sm text-neutral-500">
+								No attendees found.
+							</p>
+						)}
+						{isLoading && (
+							<div className="col-span-full flex justify-center py-4">
+								<div className="animate-spin rounded-full h-10 w-10 border-t-2 border-b-2 border-neutral-900" />
+							</div>
+						)}
 						{filteredAttendees.map((attendee) => (
 							<article
 								key={attendee.id}
