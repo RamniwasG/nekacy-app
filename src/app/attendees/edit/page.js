@@ -30,6 +30,7 @@ function EditAttendeeForm() {
       name: form.get('name'),
       address: form.get('address'),
       gift: `₹${Number(form.get('gift')).toLocaleString('en-IN')}`,
+      other: form.get('other')?.trim() || '',
       paymentMode: form.get('paymentMode'),
     }).then(() => router.push('/attendees')).catch(console.error);
   }
@@ -64,6 +65,10 @@ function EditAttendeeForm() {
             <div className="flex flex-col gap-2">
               <label htmlFor="gift" className="text-sm font-bold text-neutral-700">Cash Gift (₹)</label>
               <input id="gift" name="gift" type="number" min="0" required defaultValue={defaultGift} className="h-12 rounded-xl border border-neutral-300 px-4 outline-none focus:border-neutral-900" />
+            </div>
+            <div className="flex flex-col gap-2">
+              <label htmlFor="other" className="text-sm font-bold text-neutral-700">Other <span className="font-normal text-neutral-400">(optional)</span></label>
+              <input id="other" name="other" type="text" defaultValue={attendee.other || ''} placeholder="Enter other details" className="h-12 rounded-xl border border-neutral-300 px-4 outline-none focus:border-neutral-900" />
             </div>
             <div className="flex flex-col gap-2">
               <label htmlFor="paymentMode" className="text-sm font-bold text-neutral-700">Payment Mode</label>

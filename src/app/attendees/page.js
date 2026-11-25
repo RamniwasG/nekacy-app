@@ -7,6 +7,15 @@ import { ArrowLeft, Grid2X2, List, LogOut, Pencil, Plus, Search, SlidersHorizont
 import { setAttendees } from '../../store/slices/appSlice';
 import { attendeeApi } from '../../lib/api';
 
+function toTitleCase(value) {
+	return (value || '')
+		.toLowerCase()
+		.split(/\s+/)
+		.filter(Boolean)
+		.map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+		.join(' ');
+}
+
 export default function AttendeesPage() {
 	const [view, setView] = useState('card');
 	const [searchQuery, setSearchQuery] = useState('');
@@ -82,8 +91,8 @@ export default function AttendeesPage() {
 								className="text-3xl font-extrabold tracking-tight text-neutral-900 sm:text-4xl"
 							>
 								{eventId
-									? `Attendees for ${eventName || 'Selected Event'}`
-									: 'All Attendees'}
+									? `Attendees for ${eventName || 'Selected Event'} (${attendees.length})`
+									: `All Attendees (${attendees.length})`}
 							</h1>
 						</div>
 
@@ -247,7 +256,7 @@ export default function AttendeesPage() {
 							>
 								<div>
 									<div className="flex items-start justify-between gap-3">
-										<h2 className="text-xl font-extrabold text-neutral-900">{attendee.name}</h2>
+										<h2 className="text-xl font-extrabold text-neutral-900">{toTitleCase(attendee.name)}</h2>
 										<div className="flex gap-2">
 											<Link
 												href={`/attendees/edit?id=${encodeURIComponent(attendee.id)}&eventId=${encodeURIComponent(attendee.eventId || eventId)}`}
@@ -278,11 +287,10 @@ export default function AttendeesPage() {
 									<p className="text-xs font-bold uppercase tracking-wide text-neutral-400">
 										Cash Gift
 									</p>
-									<div className="mt-1 flex items-center justify-between gap-3">
+									<div className="mt-1 grid grid-cols-[1fr_auto_1fr] items-center gap-3">
 										<p className="text-lg font-extrabold text-[#a18d70]">{attendee.gift}</p>
-										{attendee.paymentMode && (
-											<span className="text-xs font-bold text-neutral-600">{attendee.paymentMode}</span>
-										)}
+										<p className="text-center text-xs text-neutral-500">{attendee.other ? `Other: ${attendee.other}` : ''}</p>
+										{attendee.paymentMode && <span className="justify-self-end text-xs font-bold text-neutral-600">{attendee.paymentMode}</span>}
 									</div>
 								</div>
 							</article>

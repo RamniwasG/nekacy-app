@@ -13,7 +13,7 @@ function EventsContent() {
 	const [view, setView] = useState('card');
 	const [searchQuery, setSearchQuery] = useState('');
 	const [dateFilter, setDateFilter] = useState('');
-		const [venueFilter, setVenueFilter] = useState('');
+	const [venueFilter, setVenueFilter] = useState('');
 	const [isFilterOpen, setIsFilterOpen] = useState(false);
 	const dispatch = useDispatch();
 	const router = useRouter();
