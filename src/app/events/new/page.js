@@ -49,7 +49,7 @@ export default function NewEventPage() {
           <form onSubmit={handleSubmit} className="flex flex-col gap-5">
             <div className="flex flex-col gap-2">
               <label htmlFor="name" className="text-sm font-bold text-neutral-700">Event Name</label>
-              <input id="name" name="name" required placeholder="Enter event name" className="h-12 rounded-xl border border-neutral-300 px-4 outline-none focus:border-neutral-900" />
+              <input id="name" name="name" autoFocus required placeholder="Enter event name" className="h-12 rounded-xl border border-neutral-300 px-4 outline-none focus:border-neutral-900" />
             </div>
             <div className="flex flex-col gap-2">
               <label htmlFor="date" className="text-sm font-bold text-neutral-700">Date</label>

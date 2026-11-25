@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { useSelector } from 'react-redux';
 import { ArrowLeft, Save } from 'lucide-react';
 import { attendeeApi } from '../../../lib/api';
+import { useEffect, useState } from 'react';
 
 function NewAttendeeForm() {
   const router = useRouter();
@@ -12,6 +13,10 @@ function NewAttendeeForm() {
   const selectedEvent = useSelector((state) => state.app.selectedEvent);
   const eventId = selectedEvent?.id || '';
   const eventName = selectedEvent?.name || '';
+
+  const [addresses, setAddresses] = useState([]);
+  const [address, setAddress] = useState('');
+  const [showAddressSuggestions, setShowAddressSuggestions] = useState(false);
 
   async function saveAttendee(event) {
     event.preventDefault();
@@ -34,6 +39,23 @@ function NewAttendeeForm() {
       .catch(console.error);
   }
 
+  useEffect(() => {
+    attendeeApi.list()
+      .then((attendees) => {
+        const attendeeList = Array.isArray(attendees) ? attendees : [];
+        const uniqueAddresses = Array.from(new Map(attendeeList
+          .map((attendee) => attendee.address?.trim())
+          .filter(Boolean)
+          .map((value) => [value.toLowerCase(), value])).values());
+        setAddresses(uniqueAddresses);
+      })
+      .catch(console.error);
+  }, []);
+
+  const addressSuggestions = (Array.isArray(addresses) ? addresses : [])
+    .filter((value) => value.toLowerCase().includes(address.trim().toLowerCase()))
+    .slice(0, 8);
+
   return (
     <main className="min-h-screen bg-[#f4efe7] px-5 py-6 sm:px-10 sm:py-8">
       <div className="mx-auto max-w-xl">
@@ -46,11 +68,43 @@ function NewAttendeeForm() {
           <form onSubmit={saveAttendee} className="flex flex-col gap-5">
             <div className="flex flex-col gap-2">
               <label htmlFor="name" className="text-sm font-bold text-neutral-700">Attendee Name</label>
-              <input id="name" name="name" required placeholder="Enter attendee name" className="h-12 rounded-xl border border-neutral-300 px-4 outline-none focus:border-neutral-900" />
+              <input id="name" name="name" autoFocus required placeholder="Enter attendee name" className="h-12 rounded-xl border border-neutral-300 px-4 outline-none focus:border-neutral-900" />
             </div>
-            <div className="flex flex-col gap-2">
+            <div className="relative flex flex-col gap-2">
               <label htmlFor="address" className="text-sm font-bold text-neutral-700">Address</label>
-              <input id="address" name="address" required placeholder="Enter address" className="h-12 rounded-xl border border-neutral-300 px-4 outline-none focus:border-neutral-900" />
+              <input
+                id="address"
+                name="address"
+                required
+                value={address}
+                onChange={(event) => {
+                  setAddress(event.target.value);
+                  setShowAddressSuggestions(true);
+                }}
+                onFocus={() => setShowAddressSuggestions(true)}
+                onBlur={() => window.setTimeout(() => setShowAddressSuggestions(false), 150)}
+                placeholder="Enter or select address"
+                autoComplete="street-address"
+                className="h-12 rounded-xl border border-neutral-300 px-4 outline-none focus:border-neutral-900"
+              />
+              {showAddressSuggestions && addressSuggestions.length > 0 && (
+                <div className="absolute top-[76px] z-20 max-h-48 w-full overflow-y-auto rounded-xl border border-neutral-200 bg-white shadow-lg">
+                  {addressSuggestions.map((suggestion) => (
+                    <button
+                      key={suggestion}
+                      type="button"
+                      onMouseDown={(event) => event.preventDefault()}
+                      onClick={() => {
+                        setAddress(suggestion);
+                        setShowAddressSuggestions(false);
+                      }}
+                      className="block w-full px-4 py-3 text-left text-sm text-neutral-700 hover:bg-neutral-100"
+                    >
+                      {suggestion}
+                    </button>
+                  ))}
+                </div>
+              )}
             </div>
             <div className="flex flex-col gap-2">
               <label htmlFor="gift" className="text-sm font-bold text-neutral-700">Cash Gift (₹)</label>
@@ -62,7 +116,7 @@ function NewAttendeeForm() {
             </div>
             <div className="flex flex-col gap-2">
               <label htmlFor="paymentMode" className="text-sm font-bold text-neutral-700">Payment Mode</label>
-              <select id="paymentMode" name="paymentMode" required defaultValue="" className="h-12 rounded-xl border border-neutral-300 bg-white px-4 outline-none focus:border-neutral-900">
+              <select id="paymentMode" name="paymentMode" required defaultValue="Cash" className="h-12 rounded-xl border border-neutral-300 bg-white px-4 outline-none focus:border-neutral-900">
                 <option value="" disabled>Select payment mode</option>
                 <option value="Cash">Cash</option>
                 <option value="GPay">GPay</option>

@@ -72,7 +72,7 @@ function EditAttendeeForm() {
             </div>
             <div className="flex flex-col gap-2">
               <label htmlFor="paymentMode" className="text-sm font-bold text-neutral-700">Payment Mode</label>
-              <select id="paymentMode" name="paymentMode" required defaultValue={attendee.paymentMode || ''} className="h-12 rounded-xl border border-neutral-300 bg-white px-4 outline-none focus:border-neutral-900">
+              <select id="paymentMode" name="paymentMode" required defaultValue={attendee.paymentMode || 'Cash'} className="h-12 rounded-xl border border-neutral-300 bg-white px-4 outline-none focus:border-neutral-900">
                 <option value="" disabled>Select payment mode</option>
                 <option value="Cash">Cash</option>
                 <option value="GPay">GPay</option>

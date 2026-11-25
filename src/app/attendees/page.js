@@ -38,9 +38,12 @@ export default function AttendeesPage() {
 		.filter((attendee) => !giftFilter || attendee.gift === giftFilter)
 		.filter((attendee) => !paymentModeFilter || attendee.paymentMode === paymentModeFilter);
 
-	const addresses = [...new Set(attendees.map((attendee) => attendee.address))].sort();
-	const gifts = [...new Set(attendees.map((attendee) => attendee.gift))].sort();
-	const paymentModes = [...new Set(attendees.map((attendee) => attendee.paymentMode).filter(Boolean))].sort();
+	const addresses = [...new Set(attendees.map((attendee) => attendee.address?.trim()).filter(Boolean))].sort((a, b) => a.localeCompare(b));
+	const gifts = [...new Set(attendees.map((attendee) => attendee.gift?.trim()).filter(Boolean))].sort((a, b) => a.localeCompare(b, undefined, { numeric: true }));
+	const paymentModes = [...new Map(attendees
+		.map((attendee) => attendee.paymentMode?.trim())
+		.filter(Boolean)
+		.map((mode) => [mode.toLowerCase(), mode]))].values();
 
 	useEffect(() => {
 		if (!eventId) return;
@@ -206,7 +209,7 @@ export default function AttendeesPage() {
 											className="h-11 rounded-xl border border-neutral-300 px-3"
 										>
 											<option value="">All payment modes</option>
-											{paymentModes.map((mode) => (
+											{[...paymentModes].map((mode) => (
 												<option key={mode} value={mode}>
 													{mode}
 												</option>

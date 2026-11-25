@@ -17,8 +17,8 @@ function EventsContent() {
 	const [isFilterOpen, setIsFilterOpen] = useState(false);
 	const dispatch = useDispatch();
 	const router = useRouter();
-	const searchParams = useSearchParams();
-	const listMode = searchParams.get('mode') || 'all';
+		const searchParams = useSearchParams();
+		const listMode = searchParams.get('mode') || 'all';
 	const events = useSelector((state) => state.app.events);
 
 	useEffect(() => {
@@ -31,11 +31,11 @@ function EventsContent() {
 	const filteredEvents = [...events]
 		.reverse()
 		.filter((event) => event.name.toLowerCase().includes(searchQuery.trim().toLowerCase()))
-		.filter((event) => !dateFilter || event.date === dateFilter)
+		.filter((event) => !dateFilter || toDateValue(event.date) === dateFilter)
 		.filter((event) => !venueFilter || event.venue === venueFilter);
 
-	const dates = [...new Set(events.map((event) => event.date))].sort();
-	const venues = [...new Set(events.map((event) => event.venue))].sort();
+	const dates = [...new Set(events.map((event) => toDateValue(event.date)).filter(Boolean))].sort().reverse();
+	const venues = [...new Set(events.map((event) => event.venue?.trim()).filter(Boolean))].sort((a, b) => a.localeCompare(b));
 
 	return (
 		<main className="min-h-screen bg-[#f4efe7] px-5 py-6 sm:px-10 sm:py-8">
@@ -152,9 +152,7 @@ function EventsContent() {
 											<option value="">All Dates</option>
 											{dates.map((date) => (
 												<option key={date} value={date}>
-													{new Date(`${date}T00:00:00`).toLocaleDateString('en-US', {
-														month: 'long', day: 'numeric', year: 'numeric',
-													})}
+													{formatEventDate(`${date}T00:00:00`)}
 												</option>
 											))}
 										</select>
@@ -277,8 +275,17 @@ export default function EventsPage() {
 	);
 }
 
+function toDateValue(value) {
+	if (!value) return '';
+	const date = new Date(value);
+	if (Number.isNaN(date.getTime())) return '';
+	const year = date.getFullYear();
+	const month = String(date.getMonth() + 1).padStart(2, '0');
+	const day = String(date.getDate()).padStart(2, '0');
+	return `${year}-${month}-${day}`;
+}
+
 function formatEventDate(value) {
-	if (!value) return 'Date unavailable';
 	const date = new Date(value);
 	if (Number.isNaN(date.getTime())) return 'Date unavailable';
 	return date.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
