@@ -200,7 +200,7 @@ function EventsContent() {
 					<div
 						className={
 							view === 'card'
-								? 'grid grid-cols-1 gap-5 md:grid-cols-3 lg:grid-cols-4'
+								? 'grid grid-cols-1 gap-5 md:grid-cols-3 lg:grid-cols-4 cursor-pointer'
 								: 'flex flex-col gap-4'
 						}
 					>

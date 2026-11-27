@@ -21,7 +21,7 @@ export default function AttendeesPage() {
 	const [searchQuery, setSearchQuery] = useState('');
 	const [addressFilter, setAddressFilter] = useState('');
 	const [giftFilter, setGiftFilter] = useState('');
-	const [paymentModeFilter, setPaymentModeFilter] = useState('');
+	const [otherGiftFilter, setOtherGiftFilter] = useState('');
 	const [isFilterOpen, setIsFilterOpen] = useState(false);
 	const [isLoading, setIsLoading] = useState(true);
 	const dispatch = useDispatch();
@@ -37,14 +37,11 @@ export default function AttendeesPage() {
 		.filter((attendee) => attendee.name.toLowerCase().includes(searchQuery.trim().toLowerCase()))
 		.filter((attendee) => !addressFilter || attendee.address === addressFilter)
 		.filter((attendee) => !giftFilter || attendee.gift === giftFilter)
-		.filter((attendee) => !paymentModeFilter || attendee.paymentMode === paymentModeFilter);
+		.filter((attendee) => !otherGiftFilter || attendee.other === otherGiftFilter);
 
 	const addresses = [...new Set(attendees.map((attendee) => attendee.address?.trim()).filter(Boolean))].sort((a, b) => a.localeCompare(b));
 	const gifts = [...new Set(attendees.map((attendee) => attendee.gift?.trim()).filter(Boolean))].sort((a, b) => a.localeCompare(b, undefined, { numeric: true }));
-	const paymentModes = [...new Map(attendees
-		.map((attendee) => attendee.paymentMode?.trim())
-		.filter(Boolean)
-		.map((mode) => [mode.toLowerCase(), mode]))].values();
+    const othergifts = [...new Set(attendees.map((attendee) => attendee.other?.trim()).filter(Boolean))].sort((a, b) => a.localeCompare(b));
 
 	useEffect(() => {
 		if (!eventId) return;
@@ -206,16 +203,16 @@ export default function AttendeesPage() {
 										</select>
 									</label>
 									<label className="flex flex-col gap-2 text-sm font-bold">
-										Payment Mode
+										All other gifts
 										<select
-											value={paymentModeFilter}
-											onChange={(e) => setPaymentModeFilter(e.target.value)}
+											value={otherGiftFilter}
+											onChange={(e) => setOtherGiftFilter(e.target.value)}
 											className="h-11 rounded-xl border border-neutral-300 px-3"
 										>
-											<option value="">All payment modes</option>
-											{[...paymentModes].map((mode) => (
-												<option key={mode} value={mode}>
-													{mode}
+											<option value="">Other gifts</option>
+											{[...othergifts].map((og) => (
+												<option key={og} value={og}>
+													{og}
 												</option>
 											))}
 										</select>
@@ -227,7 +224,7 @@ export default function AttendeesPage() {
 										onClick={() => {
 											setAddressFilter('');
 											setGiftFilter('');
-											setPaymentModeFilter('');
+											setOtherGiftFilter('');
 										}}
 										className="h-11 flex-1 rounded-xl border border-neutral-300 text-sm font-bold"
 									>
